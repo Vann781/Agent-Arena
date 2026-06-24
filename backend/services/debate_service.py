@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone
 
 from backend.core.exceptions import DebateCompletedError, DebateNotFoundError
@@ -44,7 +45,12 @@ def add_round(debate_id: str, round_data: DebateRound) -> DebateSession:
         debate.status = "completed"
         total_pro = sum(r.score_pro for r in debate.rounds)
         total_con = sum(r.score_con for r in debate.rounds)
-        debate.winner = "pro" if total_pro >= total_con else "con"
+        if total_pro > total_con:
+            debate.winner = "pro"
+        elif total_con > total_pro:
+            debate.winner = "con"
+        else:
+            debate.winner = random.choice(["pro", "con"])
     update_document(COLLECTION, debate_id, debate.model_dump())
     return debate
 

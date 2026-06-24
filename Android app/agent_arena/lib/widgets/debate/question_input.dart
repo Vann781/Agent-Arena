@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 
 class QuestionInput extends StatefulWidget {
   final void Function(String question, String? targetAgent) onSubmitted;
@@ -81,13 +82,13 @@ class _QuestionInputState extends State<QuestionInput> {
                     value: null,
                     child: Text('All agents'),
                   ),
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: 'agent_a',
-                    child: Text('Agent A'),
+                    child: Text(displayName('agent_a')),
                   ),
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: 'agent_b',
-                    child: Text('Agent B'),
+                    child: Text(displayName('agent_b')),
                   ),
                 ],
                 onChanged: (v) => setState(() => _targetAgent = v),

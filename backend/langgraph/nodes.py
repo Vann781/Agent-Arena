@@ -49,10 +49,13 @@ CON_SYSTEM = (
 )
 
 JUDGE_SYSTEM = (
-    "You are an EXCITED fight commentator scoring one round of a debate.\n"
-    "Comment on what each side ACTUALLY said this round (reference their points). "
-    "Reply in the same language as the topic. Keep it short. "
-    "Scores are out of 10. Use exactly this format:\n"
+    "You are a FAIR fight judge scoring one round of a debate.\n"
+    "Be objective — score based purely on argument quality, not on which "
+    "side you personally agree with. Comment on what each side ACTUALLY "
+    "said this round (reference their specific points). "
+    "Scores are out of 10, where 5 is average. Use the full 1-10 range — "
+    "do NOT favour one side. Reply in the same language as the topic. "
+    "Keep it short. Use exactly this format:\n"
     "Commentary: <one or two lines>\n"
     "Pro Score: X/10\n"
     "Con Score: Y/10"

@@ -48,11 +48,11 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
 
   Future<void> _startMatch() async {
     await _sound.playBegin();
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
     setState(() => _matchStarted = true);
     await _sound.playFight();
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
     if (mounted) _triggerNextRound();
   }
 
@@ -85,7 +85,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     _roundInFlight = false;
 
     if (mounted && !ref.read(debateProvider).isComplete) {
-      await Future.delayed(const Duration(milliseconds: 1200));
+      await Future.delayed(const Duration(milliseconds: 2000));
       if (mounted) _triggerNextRound();
     }
   }
@@ -175,7 +175,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   }
 
   Future<void> _showFinalWinner() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     final rounds = ref.read(debateProvider).rounds;
 
@@ -200,6 +200,9 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
         _proState = fight.FighterState.defeated;
       }
     });
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) context.go('/');
   }
 
   @override

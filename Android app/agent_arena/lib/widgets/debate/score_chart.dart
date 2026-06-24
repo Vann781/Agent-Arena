@@ -7,6 +7,19 @@ class ScoreChart extends StatelessWidget {
 
   const ScoreChart({super.key, required this.scores});
 
+  Color _barColor(String agentId) {
+    switch (agentId) {
+      case 'pro':
+      case 'agent_a':
+        return AppColors.agentA;
+      case 'con':
+      case 'agent_b':
+        return AppColors.agentB;
+      default:
+        return AppColors.purple;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (scores.isEmpty) return const SizedBox.shrink();
@@ -66,9 +79,7 @@ class ScoreChart extends StatelessWidget {
                       value: ratio,
                       backgroundColor: AppColors.surfaceLight,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        entry.key.contains('a')
-                            ? AppColors.agentA
-                            : AppColors.agentB,
+                        _barColor(entry.key),
                       ),
                       minHeight: 6,
                     ),
