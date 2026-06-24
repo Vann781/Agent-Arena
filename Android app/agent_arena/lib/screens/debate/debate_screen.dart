@@ -47,7 +47,7 @@ class DebateScreen extends ConsumerWidget {
               onPressed: () => context.go('/debate/$debateId/result'),
               child: const Text(
                 'Results',
-                style: TextStyle(color: AppColors.cyan),
+                style: TextStyle(color: AppColors.rambahaur),
               ),
             ),
         ],
@@ -82,7 +82,7 @@ class DebateScreen extends ConsumerWidget {
                           style: const TextStyle(
                             color: AppColors.textMuted,
                             fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       ),
@@ -140,8 +140,8 @@ class DebateScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: Border(top: BorderSide(color: AppColors.glassBorder)),
+              color: AppColors.cardBackground,
+              border: Border(top: BorderSide(color: AppColors.cardBorder)),
             ),
             child: Column(
               children: [

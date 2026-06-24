@@ -55,155 +55,206 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              const AnimatedGradientText(
-                text: 'Agent Arena',
-                colors: [AppColors.cyan, AppColors.purple, AppColors.pink],
-                fontSize: 40,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Multi-Agent AI Debate Platform',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-              ),
-              const SizedBox(height: 48),
-              GlassmorphismCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Start a Debate',
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0, -0.3),
+            radius: 1.5,
+            colors: [Color(0xFF1A1A3E), Color(0xFF0D0D1A), Color(0xFF05050D)],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                const AnimatedGradientText(
+                  text: 'Agent Arena',
+                  colors: [
+                    AppColors.rambahaur,
+                    AppColors.amber,
+                    AppColors.shaamBahadur,
+                  ],
+                  fontSize: 40,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Multi-Agent AI Debate Platform',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 48),
+                GlassmorphismCard(
+                  borderColor: AppColors.rambahaur,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Start a Debate',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _topicController,
-                      maxLines: 3,
-                      decoration: const InputDecoration(
-                        labelText: 'Debate Topic',
-                        hintText:
-                            'e.g., AI will replace all software engineers',
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _topicController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Debate Topic',
+                          hintText:
+                              'e.g., AI will replace all software engineers',
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Text(
-                          'Rounds:',
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(width: 12),
-                        SizedBox(
-                          width: 120,
-                          child: Slider(
-                            value: _maxRounds.toDouble(),
-                            min: 1,
-                            max: 10,
-                            divisions: 9,
-                            activeColor: AppColors.cyan,
-                            inactiveColor: AppColors.surfaceLight,
-                            label: '$_maxRounds',
-                            onChanged: (v) =>
-                                setState(() => _maxRounds = v.round()),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Text(
+                            'Rounds:',
+                            style: TextStyle(color: AppColors.textSecondary),
                           ),
-                        ),
-                        Text(
-                          '$_maxRounds',
-                          style: const TextStyle(
-                            color: AppColors.cyan,
-                            fontWeight: FontWeight.w600,
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 120,
+                            child: Slider(
+                              value: _maxRounds.toDouble(),
+                              min: 1,
+                              max: 10,
+                              divisions: 9,
+                              activeColor: AppColors.rambahaur,
+                              inactiveColor: AppColors.surfaceLight,
+                              label: '$_maxRounds',
+                              onChanged: (v) =>
+                                  setState(() => _maxRounds = v.round()),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: debateState.status == DebateStatus.loading
-                            ? null
-                            : _startDebate,
-                        child: debateState.status == DebateStatus.loading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.background,
+                          Text(
+                            '$_maxRounds',
+                            style: const TextStyle(
+                              color: AppColors.rambahaur,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: debateState.status == DebateStatus.loading
+                              ? null
+                              : _startDebate,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.rambahaur,
+                            foregroundColor: const Color(0xFF0D0D1A),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: debateState.status == DebateStatus.loading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Color(0xFF0D0D1A),
+                                  ),
+                                )
+                              : const Text(
+                                  'Start Debate',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
                                 ),
-                              )
-                            : const Text('Start Debate'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GlassmorphismCard(
+                        onTap: () => context.push('/history'),
+                        borderColor: AppColors.cyan,
+                        child: const Column(
+                          children: [
+                            Icon(
+                              Icons.history,
+                              color: AppColors.cyan,
+                              size: 32,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'History',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GlassmorphismCard(
+                        onTap: () => context.push('/chaos'),
+                        borderColor: AppColors.shaamBahadur,
+                        child: const Column(
+                          children: [
+                            Icon(
+                              Icons.auto_awesome,
+                              color: AppColors.shaamBahadur,
+                              size: 32,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Chaos Mode',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GlassmorphismCard(
+                        onTap: () => context.push('/profile'),
+                        borderColor: AppColors.purple,
+                        child: const Column(
+                          children: [
+                            Icon(
+                              Icons.person,
+                              color: AppColors.purple,
+                              size: 32,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Profile',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: GlassmorphismCard(
-                      onTap: () => context.push('/history'),
-                      child: const Column(
-                        children: [
-                          Icon(Icons.history, color: AppColors.cyan, size: 32),
-                          SizedBox(height: 8),
-                          Text(
-                            'History',
-                            style: TextStyle(color: AppColors.textPrimary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GlassmorphismCard(
-                      onTap: () => context.push('/chaos'),
-                      child: const Column(
-                        children: [
-                          Icon(
-                            Icons.auto_awesome,
-                            color: AppColors.pink,
-                            size: 32,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Chaos Mode',
-                            style: TextStyle(color: AppColors.textPrimary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GlassmorphismCard(
-                      onTap: () => context.push('/profile'),
-                      child: const Column(
-                        children: [
-                          Icon(Icons.person, color: AppColors.purple, size: 32),
-                          SizedBox(height: 8),
-                          Text(
-                            'Profile',
-                            style: TextStyle(color: AppColors.textPrimary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

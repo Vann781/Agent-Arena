@@ -95,7 +95,11 @@ class _ChaosModeScreenState extends ConsumerState<ChaosModeScreen> {
           children: [
             const AnimatedGradientText(
               text: 'Chaos Mode',
-              colors: [AppColors.pink, AppColors.amber, AppColors.purple],
+              colors: [
+                AppColors.rambahaur,
+                AppColors.shaamBahadur,
+                AppColors.amber,
+              ],
               fontSize: 32,
             ),
             const SizedBox(height: 8),
@@ -182,8 +186,8 @@ class _ChaosModeScreenState extends ConsumerState<ChaosModeScreen> {
                       min: 1,
                       max: 6,
                       divisions: 5,
-                      activeColor: AppColors.pink,
-                      inactiveColor: AppColors.surfaceLight,
+                      activeColor: AppColors.shaamBahadur,
+                      inactiveColor: AppColors.cardBackground,
                       label: '$_maxRounds',
                       onChanged: (v) => setState(() => _maxRounds = v.round()),
                     ),
@@ -191,8 +195,8 @@ class _ChaosModeScreenState extends ConsumerState<ChaosModeScreen> {
                   Text(
                     '$_maxRounds',
                     style: const TextStyle(
-                      color: AppColors.pink,
-                      fontWeight: FontWeight.w600,
+                      color: AppColors.shaamBahadur,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ],
@@ -206,7 +210,7 @@ class _ChaosModeScreenState extends ConsumerState<ChaosModeScreen> {
                     ? null
                     : _startChaos,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.pink,
+                  backgroundColor: AppColors.shaamBahadur,
                 ),
                 child: debateState.status == DebateStatus.loading
                     ? const SizedBox(

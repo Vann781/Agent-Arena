@@ -8,15 +8,17 @@ class GlassmorphismCard extends StatelessWidget {
   final EdgeInsetsGeometry? customPadding;
   final VoidCallback? onTap;
   final Gradient? gradient;
+  final Color? borderColor;
 
   const GlassmorphismCard({
     super.key,
     required this.child,
-    this.borderRadius = 20,
+    this.borderRadius = 12,
     this.padding = 16,
     this.customPadding,
     this.onTap,
     this.gradient,
+    this.borderColor,
   });
 
   @override
@@ -24,18 +26,13 @@ class GlassmorphismCard extends StatelessWidget {
     final card = Container(
       padding: customPadding ?? EdgeInsets.all(padding),
       decoration: BoxDecoration(
-        gradient:
-            gradient ??
-            LinearGradient(
-              colors: [
-                AppColors.glassBackground,
-                AppColors.glassBackground.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+        gradient: gradient,
+        color: gradient == null ? AppColors.surface : null,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: AppColors.glassBorder),
+        border: Border.all(
+          color: borderColor ?? AppColors.glassBorder,
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.glassShadow,

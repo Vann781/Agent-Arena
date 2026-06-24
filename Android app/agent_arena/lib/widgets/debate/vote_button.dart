@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 
 class VoteButton extends StatelessWidget {
   final String agentId;
@@ -27,7 +28,7 @@ class VoteButton extends StatelessWidget {
           color: isSelected
               ? AppColors.amber.withValues(alpha: 0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected
                 ? AppColors.amber.withValues(alpha: 0.5)
@@ -43,7 +44,7 @@ class VoteButton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  agentId.replaceAll('_', ' ').toUpperCase(),
+                  displayName(agentId).toUpperCase(),
                   style: TextStyle(
                     color: color,
                     fontSize: 12,

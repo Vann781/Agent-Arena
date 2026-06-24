@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 import '../../models/history_model.dart';
 
 class JudgeResultCard extends StatelessWidget {
@@ -9,19 +10,15 @@ class JudgeResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final winColor = result.winner == 'pro'
+        ? AppColors.rambahaur
+        : AppColors.shaamBahadur;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.purple.withValues(alpha: 0.1),
-            AppColors.cyan.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.purple.withValues(alpha: 0.3)),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: winColor.withValues(alpha: 0.3), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,20 +27,21 @@ class JudgeResultCard extends StatelessWidget {
             child: Text(
               'Judge\'s Verdict',
               style: TextStyle(
-                color: AppColors.purple,
+                color: AppColors.cyan,
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
           const SizedBox(height: 16),
           Center(
             child: Text(
-              result.winner.replaceAll('_', ' ').toUpperCase(),
-              style: const TextStyle(
-                color: AppColors.cyan,
+              displayName(result.winner).toUpperCase(),
+              style: TextStyle(
+                color: winColor,
                 fontSize: 28,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
               ),
             ),
           ),
@@ -55,7 +53,7 @@ class JudgeResultCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      entry.key.replaceAll('_', ' '),
+                      displayName(entry.key).toUpperCase(),
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 14,
@@ -79,8 +77,9 @@ class JudgeResultCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.glassBackground,
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: AppColors.glassBorder),
             ),
             child: Text(
               result.explanation,
@@ -109,7 +108,7 @@ class JudgeResultCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${entry.key.replaceAll('_', ' ')}: ',
+                      '${displayName(entry.key)}: ',
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 12,

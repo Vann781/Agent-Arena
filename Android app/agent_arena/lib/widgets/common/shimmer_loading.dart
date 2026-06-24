@@ -11,8 +11,8 @@ class ShimmerLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.surfaceLight,
-      highlightColor: AppColors.glassBackground,
+      baseColor: AppColors.cardBackground,
+      highlightColor: AppColors.surfaceLight,
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -22,7 +22,7 @@ class ShimmerLoading extends StatelessWidget {
           child: Container(
             height: itemHeight,
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
             ),
           ),

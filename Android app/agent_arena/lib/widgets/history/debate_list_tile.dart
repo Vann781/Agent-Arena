@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 import '../../core/utils/formatters.dart';
 import '../../models/history_model.dart';
 
@@ -14,9 +15,9 @@ class DebateListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.glassBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.glassBorder),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -56,7 +57,7 @@ class DebateListTile extends StatelessWidget {
                         children: [
                           if (debate.winner != null) ...[
                             Text(
-                              debate.winner!.replaceAll('_', ' '),
+                              displayName(debate.winner!),
                               style: const TextStyle(
                                 color: AppColors.cyan,
                                 fontSize: 12,
@@ -66,7 +67,7 @@ class DebateListTile extends StatelessWidget {
                             Container(
                               width: 1,
                               height: 10,
-                              color: AppColors.glassBorder,
+                              color: AppColors.cardBorder,
                             ),
                             const SizedBox(width: 8),
                           ],

@@ -23,16 +23,15 @@ class DebateHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.surface,
-            AppColors.surfaceLight.withValues(alpha: 0.5),
+        gradient: RadialGradient(
+          colors: const [
+            Color(0xFF1A1A3E),
+            Color(0xFF0D0D1A),
+            Color(0xFF05050D),
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +40,7 @@ class DebateHeader extends StatelessWidget {
             topic,
             style: const TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w900,
               color: AppColors.textPrimary,
             ),
           ),
@@ -67,7 +66,9 @@ class DebateHeader extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: AppColors.surfaceLight,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.cyan),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.rambahaur,
+              ),
               minHeight: 6,
             ),
           ),

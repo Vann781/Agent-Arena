@@ -90,7 +90,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                 height: 24,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppColors.cyan,
+                                  color: AppColors.rambahaur,
                                 ),
                               ),
                             ),

@@ -22,7 +22,8 @@ from backend.services.gemini_service import generate_text
 TONE_TAGS = ["[sarcastic]", "[serious]", "[aggressive]"]
 
 PRO_SYSTEM = (
-    "You are PRO — a cocky street-fighter who argues FOR the topic.\n"
+    "You are RAMBAHAUR — a cocky, lion-hearted street-fighter who argues "
+    "FOR the topic. Your name means 'lion-like' and you fight with roaring confidence.\n"
     "RULES:\n"
     "1. Make ONE concrete, specific point that actually supports the topic "
     "(real reasoning about the subject, not vague hype).\n"
@@ -34,10 +35,13 @@ PRO_SYSTEM = (
 )
 
 CON_SYSTEM = (
-    "You are CON — a slick, snarky fighter who argues AGAINST the topic.\n"
+    "You are SHAAM BAHADUR — a slick, snarky, regal fighter who argues "
+    "AGAINST the topic. Your name means 'evening warrior' and you fight with "
+    "cunning and wit.\n"
     "RULES:\n"
     "1. Make ONE concrete, specific point against the topic (real reasoning).\n"
-    "2. Then directly dodge and counter the exact thing PRO just said — name it, twist it.\n"
+    "2. Then directly dodge and counter the exact thing Rambahaur just said "
+    "— name it, twist it.\n"
     "3. 2-4 SHORT sharp sentences with witty comebacks.\n"
     "4. Reply in the SAME language and script as the Topic. If the topic mixes "
     "Hindi and English (Hinglish), reply in natural Hinglish.\n"
@@ -63,8 +67,8 @@ def _transcript(state: DebateState, limit: int = 3) -> str:
     lines = ["Debate so far:"]
     for rnd in history[-limit:]:
         lines.append(f"Round {rnd.get('round_number', '?')}:")
-        lines.append(f"  PRO: {rnd.get('pro_argument', '')}")
-        lines.append(f"  CON: {rnd.get('con_argument', '')}")
+        lines.append(f"  Rambahaur: {rnd.get('pro_argument', '')}")
+        lines.append(f"  Shaam Bahadur: {rnd.get('con_argument', '')}")
     return "\n".join(lines) + "\n\n"
 
 
@@ -85,13 +89,13 @@ def generate_pro_argument(state: DebateState) -> dict:
 
     prompt = (
         f"{PRO_SYSTEM}\n\n"
-        "ROLE: PRO\n"
+        "ROLE: RAMBAHAUR (FOR the topic)\n"
         f"Topic: {state['topic']}\n"
         f"Round {round_no} — FIGHT!\n\n"
         f"{_transcript(state)}"
     )
     if prev_con:
-        prompt += f'Opponent (CON) just said: "{prev_con}"\n\nSmash that argument and make your case!'
+        prompt += f'Opponent (Shaam Bahadur) just said: "{prev_con}"\n\nSmash that argument and make your case!'
     else:
         prompt += "Open the debate with a strong, specific case FOR the topic!"
 
@@ -106,11 +110,11 @@ def generate_con_argument(state: DebateState) -> dict:
 
     prompt = (
         f"{CON_SYSTEM}\n\n"
-        "ROLE: CON\n"
+        "ROLE: SHAAM BAHADUR (AGAINST the topic)\n"
         f"Topic: {state['topic']}\n"
         f"Round {round_no} — COUNTER!\n\n"
         f"{_transcript(state)}"
-        f'PRO just said: "{pro_now}"\n\n'
+        f'Rambahaur just said: "{pro_now}"\n\n'
         "Dodge, counter-attack, and make your own case AGAINST the topic!"
     )
 
@@ -125,8 +129,8 @@ def judge_round(state: DebateState) -> dict:
         f"{JUDGE_SYSTEM}\n\n"
         "ROLE: JUDGE\n"
         f"Topic: {state['topic']}\n\n"
-        f"PRO (Round {round_no}): {state['pro_argument']}\n\n"
-        f"CON (Round {round_no}): {state['con_argument']}\n\n"
+        f"Rambahaur (Round {round_no}): {state['pro_argument']}\n\n"
+        f"Shaam Bahadur (Round {round_no}): {state['con_argument']}\n\n"
         "Who won THIS round?"
     )
     result = generate_text(prompt)

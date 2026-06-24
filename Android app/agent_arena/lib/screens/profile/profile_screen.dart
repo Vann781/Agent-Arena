@@ -24,7 +24,7 @@ class ProfileScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [AppColors.cyan, AppColors.purple],
+                  colors: [AppColors.rambahaur, AppColors.shaamBahadur],
                 ),
               ),
               child: const Center(
@@ -44,7 +44,7 @@ class ProfileScreen extends ConsumerWidget {
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 24,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w900,
               ),
             ),
             const SizedBox(height: 8),

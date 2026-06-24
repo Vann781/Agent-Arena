@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 import '../../providers/debate_provider.dart';
 import '../../services/sound_manager.dart';
 import '../../widgets/fight/arena_background.dart';
@@ -103,7 +104,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
         .where((r) => r.agentId == 'con')
         .firstOrNull;
 
-    // PRO turn
+    // Rambahaur turn
     await _animateAgent(() async {
       if (!mounted) return;
       _conText = null;
@@ -123,7 +124,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
       setState(() {});
     });
 
-    // CON turn after PRO
+    // Shaam Bahadur turn
     await _animateAgent(() async {
       if (!mounted) return;
       _proText = null;
@@ -212,37 +213,50 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     final state = ref.watch(debateProvider);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final fighterBottom = screenHeight * 0.12;
 
     return Scaffold(
       body: Stack(
         children: [
           const ArenaBackground(),
-          // Top bar
+          // Top HUD — back button, round counter, mute
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white54),
                     onPressed: () => context.pop(),
                   ),
-                  const Spacer(),
-                  Text(
-                    state.topic ?? 'FIGHT!',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  if (_matchStarted)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.amber.withValues(alpha: 0.4),
+                        ),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        'ROUND ${state.currentRound}',
+                        style: TextStyle(
+                          color: AppColors.amber,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
                   const Spacer(),
                   IconButton(
                     icon: Icon(
                       _sound.muted ? Icons.volume_off : Icons.volume_up,
-                      color: Colors.white70,
+                      color: Colors.white54,
                     ),
                     onPressed: () =>
                         setState(() => _sound.muted = !_sound.muted),
@@ -251,29 +265,50 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
               ),
             ),
           ),
-          // Health bars
+          // Health bars — Street Fighter style at very top
           if (_matchStarted)
             Positioned(
-              top: 70,
-              left: 0,
-              right: 0,
+              top: 48,
+              left: 8,
+              right: 8,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // Rambahaur (left)
                   HealthBar(
                     percent: _proHp / 100,
-                    color: AppColors.agentA,
-                    label: 'PRO',
+                    color: AppColors.rambahaur,
+                    darkColor: AppColors.rambahaurDark,
+                    label: displayName('pro'),
+                    rightAligned: false,
                   ),
+                  const Spacer(),
+                  // Round indicator between bars
+                  Container(
+                    width: screenWidth * 0.15,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'VS',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  // Shaam Bahadur (right)
                   HealthBar(
                     percent: _conHp / 100,
-                    color: const Color(0xFFFF4081),
-                    label: 'CON',
+                    color: AppColors.shaamBahadur,
+                    darkColor: AppColors.shaamBahadurDark,
+                    label: displayName('con'),
+                    rightAligned: true,
                   ),
                 ],
               ),
             ),
-          // Round banner
+          // Round banner animation
           if (_processingRound > 0)
             Center(
               child: TweenAnimationBuilder<double>(
@@ -281,12 +316,19 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                 tween: Tween(begin: 0, end: 1),
                 builder: (_, val, __) => Opacity(
                   opacity: val,
-                  child: const Text(
-                    '⚔️ ROUND START! ⚔️',
+                  child: Text(
+                    'ROUND ${state.currentRound} — FIGHT!',
                     style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
                       color: AppColors.amber,
+                      letterSpacing: 4,
+                      shadows: [
+                        Shadow(
+                          color: Colors.orange.withValues(alpha: 0.4),
+                          blurRadius: 16,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -303,6 +345,8 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                 state: _proState,
                 isLeft: true,
                 healthPercent: _proHp / 100,
+                accentColor: AppColors.rambahaur,
+                nameColor: AppColors.rambahaur,
               ),
             ),
             Positioned(
@@ -314,31 +358,35 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                 state: _conState,
                 isLeft: false,
                 healthPercent: _conHp / 100,
+                accentColor: AppColors.shaamBahadur,
+                nameColor: AppColors.shaamBahadur,
               ),
             ),
           ],
           // Speech bubbles above fighters
           if (_proText != null && _proText!.isNotEmpty)
             Positioned(
-              left: 20,
-              bottom: fighterBottom + 180 + bottomInset,
+              left: 8,
+              bottom: fighterBottom + 170 + bottomInset,
               child: SpeechBubble(
                 text: _proText!,
-                color: AppColors.agentA,
+                color: AppColors.rambahaur,
                 isLeft: true,
+                agentName: displayName('pro'),
               ),
             ),
           if (_conText != null && _conText!.isNotEmpty)
             Positioned(
-              right: 20,
-              bottom: fighterBottom + 180 + bottomInset,
+              right: 8,
+              bottom: fighterBottom + 170 + bottomInset,
               child: SpeechBubble(
                 text: _conText!,
-                color: const Color(0xFFFF4081),
+                color: AppColors.shaamBahadur,
                 isLeft: false,
+                agentName: displayName('con'),
               ),
             ),
-          // Judge commentary
+          // Judge commentary — arcade ticker style
           if (_showJudge && _judgeText != null)
             Positioned(
               left: 0,
@@ -352,36 +400,84 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.purple.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFF0D0D1A).withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: AppColors.purple.withValues(alpha: 0.5),
+                      color: AppColors.cyan.withValues(alpha: 0.4),
+                      width: 1.5,
                     ),
                   ),
-                  child: Text(
-                    '⚡ JUDGE: $_judgeText',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 12,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('⚡', style: TextStyle(fontSize: 16)),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          _judgeText!,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          // Start banner before match
+          // Start screen — VS splash
           if (!_matchStarted)
-            const Center(
+            Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('🎌', style: TextStyle(fontSize: 80)),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 40),
                   Text(
+                    'RAMBAHAUR',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.rambahaur,
+                      letterSpacing: 4,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.rambahaur.withValues(alpha: 0.4),
+                          blurRadius: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Text(
+                    'VS',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.amber,
+                      letterSpacing: 8,
+                    ),
+                  ),
+                  Text(
+                    'SHAAM BAHADUR',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.shaamBahadur,
+                      letterSpacing: 4,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.shaamBahadur.withValues(alpha: 0.4),
+                          blurRadius: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  const Text(
                     'GET READY',
                     style: TextStyle(
                       fontSize: 36,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                       color: AppColors.amber,
                       letterSpacing: 8,
                     ),

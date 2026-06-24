@@ -48,7 +48,7 @@ final _router = GoRouter(
     ),
   ],
   errorBuilder: (context, state) => Scaffold(
-    backgroundColor: const Color(0xFF0A0E21),
+    backgroundColor: const Color(0xFF0D0D1A),
     body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

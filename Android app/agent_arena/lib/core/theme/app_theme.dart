@@ -8,9 +8,9 @@ class AppTheme {
   static ThemeData get darkGlassmorphism {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: const Color(0xFF0D0D1A),
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.cyan,
+        primary: AppColors.rambahaur,
         secondary: AppColors.purple,
         surface: AppColors.surface,
         error: AppColors.error,
@@ -47,40 +47,38 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.glassBackground,
+        color: AppColors.cardBackground,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppColors.glassBorder),
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: AppColors.cardBorder),
         ),
         elevation: 8,
         shadowColor: AppColors.glassShadow,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.cyan,
+          backgroundColor: AppColors.rambahaur,
           foregroundColor: AppColors.background,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.glassBackground,
+        fillColor: AppColors.cardBackground,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: AppColors.glassBorder),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.cardBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: AppColors.glassBorder),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.cardBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.cyan, width: 2),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.rambahaur, width: 2),
         ),
         labelStyle: const TextStyle(color: AppColors.textSecondary),
         hintStyle: const TextStyle(color: AppColors.textMuted),
@@ -97,7 +95,7 @@ class AppTheme {
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.cyan,
+        backgroundColor: AppColors.rambahaur,
         foregroundColor: AppColors.background,
       ),
       dividerTheme: DividerThemeData(

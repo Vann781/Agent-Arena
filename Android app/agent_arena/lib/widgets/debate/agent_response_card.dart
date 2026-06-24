@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 
 class AgentResponseCard extends StatelessWidget {
   final String agentId;
@@ -17,12 +18,14 @@ class AgentResponseCard extends StatelessWidget {
 
   Color get _agentColor {
     switch (agentId) {
+      case 'pro':
       case 'agent_a':
       case 'optimist':
-        return AppColors.agentA;
+        return AppColors.rambahaur;
+      case 'con':
       case 'agent_b':
       case 'pessimist':
-        return AppColors.agentB;
+        return AppColors.shaamBahadur;
       case 'engineer':
         return AppColors.agentEngineer;
       case 'economist':
@@ -39,20 +42,13 @@ class AgentResponseCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            _agentColor.withValues(alpha: 0.08),
-            _agentColor.withValues(alpha: 0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isLatest
               ? _agentColor.withValues(alpha: 0.5)
               : AppColors.glassBorder,
-          width: isLatest ? 1.5 : 1,
+          width: isLatest ? 2 : 1.5,
         ),
       ),
       child: Column(
@@ -65,14 +61,16 @@ class AgentResponseCard extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: _agentColor.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Center(
                   child: Text(
-                    agentId.isNotEmpty ? agentId[0].toUpperCase() : '?',
+                    displayName(agentId).isNotEmpty
+                        ? displayName(agentId)[0]
+                        : '?',
                     style: TextStyle(
                       color: _agentColor,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                       fontSize: 16,
                     ),
                   ),
@@ -84,11 +82,12 @@ class AgentResponseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      agentId.replaceAll('_', ' ').toUpperCase(),
+                      displayName(agentId).toUpperCase(),
                       style: TextStyle(
                         color: _agentColor,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w900,
                         fontSize: 13,
+                        letterSpacing: 1,
                       ),
                     ),
                     Text(
@@ -108,12 +107,12 @@ class AgentResponseCard extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.cyan.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    color: _agentColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: const Text(
+                  child: Text(
                     'NEW',
-                    style: TextStyle(color: AppColors.cyan, fontSize: 10),
+                    style: TextStyle(color: _agentColor, fontSize: 10),
                   ),
                 ),
             ],

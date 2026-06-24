@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 
 class WinnerBanner extends StatelessWidget {
   final String winner;
@@ -15,19 +16,15 @@ class WinnerBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final winColor = winner == 'pro'
+        ? AppColors.rambahaur
+        : AppColors.shaamBahadur;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.amber.withValues(alpha: 0.15),
-            AppColors.amber.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: winColor.withValues(alpha: 0.4), width: 2),
       ),
       child: Column(
         children: [
@@ -38,16 +35,17 @@ class WinnerBanner extends StatelessWidget {
             style: TextStyle(
               color: AppColors.amber,
               fontSize: 14,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            winner.replaceAll('_', ' ').toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            displayName(winner).toUpperCase(),
+            style: TextStyle(
+              color: winColor,
               fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2,
             ),
           ),
           const SizedBox(height: 12),

@@ -61,6 +61,9 @@ class JudgeResultScreen extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => context.go('/'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.rambahaur,
+                    ),
                     child: const Text('New Debate'),
                   ),
                 ),

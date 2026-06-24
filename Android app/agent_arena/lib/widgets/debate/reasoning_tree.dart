@@ -13,23 +13,23 @@ class ReasoningTree extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.purple.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.purple.withValues(alpha: 0.2)),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.account_tree, size: 16, color: AppColors.purple),
+              Icon(Icons.account_tree, size: 16, color: AppColors.rambahaur),
               const SizedBox(width: 6),
               const Text(
                 'Reasoning Path',
                 style: TextStyle(
-                  color: AppColors.purple,
+                  color: AppColors.rambahaur,
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
             ],
@@ -46,7 +46,7 @@ class ReasoningTree extends StatelessWidget {
                   Text(
                     '${i + 1}.',
                     style: TextStyle(
-                      color: AppColors.purple.withValues(alpha: 0.7),
+                      color: AppColors.rambahaur.withValues(alpha: 0.7),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),

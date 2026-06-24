@@ -34,8 +34,8 @@ class _QuestionInputState extends State<QuestionInput> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class _QuestionInputState extends State<QuestionInput> {
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 8),
@@ -94,7 +94,7 @@ class _QuestionInputState extends State<QuestionInput> {
               ),
               const Spacer(),
               IconButton(
-                icon: const Icon(Icons.send, color: AppColors.cyan),
+                icon: const Icon(Icons.send, color: AppColors.rambahaur),
                 onPressed: _submit,
               ),
             ],

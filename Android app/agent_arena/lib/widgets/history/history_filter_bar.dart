@@ -37,19 +37,19 @@ class HistoryFilterBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.cyan.withValues(alpha: 0.15)
-              : AppColors.glassBackground,
-          borderRadius: BorderRadius.circular(20),
+              ? AppColors.rambahaur.withValues(alpha: 0.15)
+              : AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected
-                ? AppColors.cyan.withValues(alpha: 0.5)
-                : AppColors.glassBorder,
+                ? AppColors.rambahaur.withValues(alpha: 0.5)
+                : AppColors.cardBorder,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppColors.cyan : AppColors.textSecondary,
+            color: isSelected ? AppColors.rambahaur : AppColors.textSecondary,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),

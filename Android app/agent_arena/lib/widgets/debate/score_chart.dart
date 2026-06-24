@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/colors.dart';
+import '../../core/constants/agent_names.dart';
 
 class ScoreChart extends StatelessWidget {
   final Map<String, double> scores;
@@ -15,9 +16,9 @@ class ScoreChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.glassBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.glassBorder),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +43,7 @@ class ScoreChart extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        entry.key.replaceAll('_', ' ').toUpperCase(),
+                        displayName(entry.key).toUpperCase(),
                         style: const TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 13,
@@ -51,7 +52,7 @@ class ScoreChart extends StatelessWidget {
                       Text(
                         entry.value.toStringAsFixed(1),
                         style: const TextStyle(
-                          color: AppColors.cyan,
+                          color: AppColors.rambahaur,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),

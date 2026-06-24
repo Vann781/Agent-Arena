@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../core/constants/agent_names.dart';
 
 enum FighterState { idle, attacking, hit, defeated, victory }
 
@@ -9,6 +10,8 @@ class FighterSprite extends StatefulWidget {
   final FighterState state;
   final bool isLeft;
   final double healthPercent;
+  final Color accentColor;
+  final Color nameColor;
 
   const FighterSprite({
     super.key,
@@ -17,6 +20,8 @@ class FighterSprite extends StatefulWidget {
     required this.state,
     required this.isLeft,
     required this.healthPercent,
+    this.accentColor = const Color(0xFFFFCC00),
+    this.nameColor = const Color(0xFFFFCC00),
   });
 
   @override
@@ -97,17 +102,31 @@ class _FighterSpriteState extends State<FighterSprite>
   }
 
   Widget _buildSprite() {
+    final name = displayName(widget.agentId);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(widget.spritePath, height: 120, fit: BoxFit.contain),
-        const SizedBox(height: 8),
-        Text(
-          widget.agentId.toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
+        const SizedBox(height: 6),
+        // Nameplate
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D0D1A).withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(
+              color: widget.accentColor.withValues(alpha: 0.5),
+              width: 1.5,
+            ),
+          ),
+          child: Text(
+            name.toUpperCase(),
+            style: TextStyle(
+              color: widget.nameColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+            ),
           ),
         ),
       ],
