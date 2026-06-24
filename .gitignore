@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+
+# Backend
+backend.log
+server_err.log
+
+# Flutter/Dart
+frontend/agent_arena/.dart_tool/
+frontend/agent_arena/.flutter-plugins*
+frontend/agent_arena/.packages
+frontend/agent_arena/build/
+frontend/agent_arena/*.iml
+frontend/agent_arena/pubspec.lock
+
+# Android
+frontend/agent_arena/android/.gradle/
+frontend/agent_arena/android/.kotlin/
+frontend/agent_arena/android/*.iml
+frontend/agent_arena/android/gradle/wrapper/gradle-wrapper.jar
+frontend/agent_arena/android/gradlew
+frontend/agent_arena/android/gradlew.bat
+frontend/agent_arena/android/local.properties
+frontend/agent_arena/android/hs_err_*.log
+frontend/agent_arena/android/replay_*.log
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.env.local
