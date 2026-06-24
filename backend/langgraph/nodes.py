@@ -1,75 +1,137 @@
+"""
+Debate turn logic.
+
+Each node runs ONCE per /next-round HTTP call (the graph is a single
+pro -> con -> judge pass now; the frontend drives the rounds by calling
+/next-round repeatedly). The endpoint owns round numbering, so the judge
+node no longer increments current_round.
+
+Key fixes vs the old version:
+  * Prompts force the agent to (a) make a concrete point about the ACTUAL
+    topic and (b) directly rebut the opponent's last line — not generic
+    trash talk.
+  * Agents reply in the SAME language/script as the topic, so a Hinglish
+    topic ("vayu ya suraj") produces Hinglish banter.
+  * A short transcript of previous rounds is passed in, so the debate
+    builds over time instead of restarting every round.
+"""
+
 from backend.langgraph.state import DebateState
 from backend.services.gemini_service import generate_text
 
+TONE_TAGS = ["[sarcastic]", "[serious]", "[aggressive]"]
+
 PRO_SYSTEM = (
-    "You are an AGGRESSIVE fighter debating FOR the topic. You talk like a cocky street brawler — "
-    "throw short, punchy insults and fighting metaphors. Sound like a real person trash-talking "
-    "their opponent. Keep each sentence short and impactful, like a flurry of punches. "
-    "End your response with a tone tag: [sarcastic], [serious], or [aggressive]."
+    "You are PRO — a cocky street-fighter who argues FOR the topic.\n"
+    "RULES:\n"
+    "1. Make ONE concrete, specific point that actually supports the topic "
+    "(real reasoning about the subject, not vague hype).\n"
+    "2. Then directly mock or rebut the exact thing your opponent just said.\n"
+    "3. 2-4 SHORT punchy sentences. Sound like a real person trash-talking.\n"
+    "4. Reply in the SAME language and script as the Topic. If the topic mixes "
+    "Hindi and English (Hinglish), reply in natural Hinglish.\n"
+    "5. End with exactly ONE tone tag on its own: [sarcastic], [serious], or [aggressive]."
 )
 
 CON_SYSTEM = (
-    "You are a SNARKY counter-fighter arguing AGAINST the topic. You talk like a slick defensive "
-    "fighter who mocks and dodges. Sound like a real person baiting their opponent — witty comebacks, "
-    "short jabs, fighting metaphors. Keep each sentence short and sharp. "
-    "End your response with a tone tag: [sarcastic], [serious], or [aggressive]."
+    "You are CON — a slick, snarky fighter who argues AGAINST the topic.\n"
+    "RULES:\n"
+    "1. Make ONE concrete, specific point against the topic (real reasoning).\n"
+    "2. Then directly dodge and counter the exact thing PRO just said — name it, twist it.\n"
+    "3. 2-4 SHORT sharp sentences with witty comebacks.\n"
+    "4. Reply in the SAME language and script as the Topic. If the topic mixes "
+    "Hindi and English (Hinglish), reply in natural Hinglish.\n"
+    "5. End with exactly ONE tone tag on its own: [sarcastic], [serious], or [aggressive]."
 )
 
 JUDGE_SYSTEM = (
-    "You are an EXCITED fight commentator. Give a hype评语 about the round. "
-    "Scores are out of 10. Keep it short. Format:\n"
-    "Commentary: ...\n"
+    "You are an EXCITED fight commentator scoring one round of a debate.\n"
+    "Comment on what each side ACTUALLY said this round (reference their points). "
+    "Reply in the same language as the topic. Keep it short. "
+    "Scores are out of 10. Use exactly this format:\n"
+    "Commentary: <one or two lines>\n"
     "Pro Score: X/10\n"
     "Con Score: Y/10"
 )
 
 
+def _transcript(state: DebateState, limit: int = 3) -> str:
+    """Compact recap of the most recent rounds so agents can build on them."""
+    history = state.get("rounds_history", []) or []
+    if not history:
+        return ""
+    lines = ["Debate so far:"]
+    for rnd in history[-limit:]:
+        lines.append(f"Round {rnd.get('round_number', '?')}:")
+        lines.append(f"  PRO: {rnd.get('pro_argument', '')}")
+        lines.append(f"  CON: {rnd.get('con_argument', '')}")
+    return "\n".join(lines) + "\n\n"
+
+
+def _strip_tone(result: str, default: str) -> tuple[str, str]:
+    tone = default
+    for tag in TONE_TAGS:
+        if tag.lower() in result.lower():
+            tone = tag.strip("[]")
+            # remove the tag case-insensitively
+            idx = result.lower().find(tag.lower())
+            result = (result[:idx] + result[idx + len(tag):]).strip()
+    return result, tone
+
+
 def generate_pro_argument(state: DebateState) -> dict:
-    con_prev = state.get("con_argument", "")
+    round_no = state.get("round_number", state.get("current_round", 0) + 1)
+    prev_con = state.get("prev_con_argument", "") or state.get("con_argument", "")
+
     prompt = (
-        f"{PRO_SYSTEM}\n\nTopic: {state['topic']}\n"
-        f"Round {state['current_round'] + 1} — FIGHT!\n"
+        f"{PRO_SYSTEM}\n\n"
+        "ROLE: PRO\n"
+        f"Topic: {state['topic']}\n"
+        f"Round {round_no} — FIGHT!\n\n"
+        f"{_transcript(state)}"
     )
-    if con_prev:
-        prompt += f"Opponent just said: \"{con_prev}\"\n\nSmash that argument!"
+    if prev_con:
+        prompt += f'Opponent (CON) just said: "{prev_con}"\n\nSmash that argument and make your case!'
     else:
-        prompt += "Open with a strong attack!\n"
+        prompt += "Open the debate with a strong, specific case FOR the topic!"
+
     result = generate_text(prompt)
-    tone = "aggressive"
-    for t in ["[sarcastic]", "[serious]", "[aggressive]"]:
-        if t in result:
-            tone = t.strip("[]")
-            result = result.replace(t, "").strip()
+    result, tone = _strip_tone(result, "aggressive")
     return {"pro_argument": result, "pro_tone": tone}
 
 
 def generate_con_argument(state: DebateState) -> dict:
+    round_no = state.get("round_number", state.get("current_round", 0) + 1)
+    pro_now = state.get("pro_argument", "")
+
     prompt = (
-        f"{CON_SYSTEM}\n\nTopic: {state['topic']}\n"
-        f"Round {state['current_round'] + 1} — COUNTER!\n"
-        f"They said: \"{state.get('pro_argument', '')}\"\n\n"
-        "Dodge and counter-attack!\n"
+        f"{CON_SYSTEM}\n\n"
+        "ROLE: CON\n"
+        f"Topic: {state['topic']}\n"
+        f"Round {round_no} — COUNTER!\n\n"
+        f"{_transcript(state)}"
+        f'PRO just said: "{pro_now}"\n\n'
+        "Dodge, counter-attack, and make your own case AGAINST the topic!"
     )
+
     result = generate_text(prompt)
-    tone = "sarcastic"
-    for t in ["[sarcastic]", "[serious]", "[aggressive]"]:
-        if t in result:
-            tone = t.strip("[]")
-            result = result.replace(t, "").strip()
+    result, tone = _strip_tone(result, "sarcastic")
     return {"con_argument": result, "con_tone": tone}
 
 
 def judge_round(state: DebateState) -> dict:
+    round_no = state.get("round_number", state.get("current_round", 0) + 1)
     prompt = (
-        f"{JUDGE_SYSTEM}\n\nTopic: {state['topic']}\n\n"
-        f"🔥 PRO (Round {state['current_round'] + 1}):\n{state['pro_argument']}\n\n"
-        f"💧 CON (Round {state['current_round'] + 1}):\n{state['con_argument']}\n\n"
-        "Who won this round?\n"
+        f"{JUDGE_SYSTEM}\n\n"
+        "ROLE: JUDGE\n"
+        f"Topic: {state['topic']}\n\n"
+        f"PRO (Round {round_no}): {state['pro_argument']}\n\n"
+        f"CON (Round {round_no}): {state['con_argument']}\n\n"
+        "Who won THIS round?"
     )
     result = generate_text(prompt)
-    commentary = result
-    pro_score = 5.0
-    con_score = 5.0
+
+    pro_score, con_score = 5.0, 5.0
     for line in result.split("\n"):
         lower = line.lower()
         if "pro score" in lower:
@@ -82,20 +144,11 @@ def judge_round(state: DebateState) -> dict:
                 con_score = float(line.split(":")[1].strip().split("/")[0])
             except (ValueError, IndexError):
                 pass
-    round_entry = {
-        "round_number": state["current_round"] + 1,
-        "pro_argument": state["pro_argument"],
-        "pro_tone": state.get("pro_tone", "serious"),
-        "con_argument": state["con_argument"],
-        "con_tone": state.get("con_tone", "serious"),
-        "judge_feedback": commentary,
-        "score_pro": pro_score,
-        "score_con": con_score,
-    }
+
+    # NOTE: round numbering and persistence are handled by the endpoint.
+    # This node only returns this round's verdict.
     return {
-        "judge_feedback": commentary,
+        "judge_feedback": result,
         "score_pro": pro_score,
         "score_con": con_score,
-        "current_round": state["current_round"] + 1,
-        "rounds_history": [*state.get("rounds_history", []), round_entry],
     }
