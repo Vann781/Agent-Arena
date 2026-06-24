@@ -37,6 +37,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   double _loserScore = 0;
   bool _matchStarted = false;
   int _processingRound = 0;
+  bool _roundInFlight = false;
 
   @override
   void initState() {
@@ -55,13 +56,32 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   }
 
   Future<void> _triggerNextRound() async {
+    if (_roundInFlight) return;
+    if (ref.read(debateProvider).isComplete) return;
+    _roundInFlight = true;
+
     final notifier = ref.read(debateProvider.notifier);
-    setState(() => _processingRound = 1);
-    _showJudge = false;
-    _proText = null;
-    _conText = null;
+    setState(() {
+      _processingRound = 1;
+      _showJudge = false;
+      _proText = null;
+      _conText = null;
+    });
+
     await notifier.advanceRound();
+    if (!mounted) {
+      _roundInFlight = false;
+      return;
+    }
+
+    if (ref.read(debateProvider).status == DebateStatus.error) {
+      setState(() => _processingRound = 0);
+      _roundInFlight = false;
+      return;
+    }
+
     await _animateRound();
+    _roundInFlight = false;
   }
 
   Future<void> _animateRound() async {
@@ -88,7 +108,9 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
       if (proResp?.tone == 'sarcastic') {
         await Future.delayed(const Duration(seconds: 1));
       }
-      _conHp -= proResp?.tone == 'aggressive' ? 35 : 25;
+      _conHp = (_conHp - (proResp?.tone == 'aggressive' ? 35 : 25))
+          .clamp(0, 100)
+          .toDouble();
       await Future.delayed(const Duration(seconds: 2));
       _proState = fight.FighterState.idle;
       setState(() {});
@@ -104,7 +126,9 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
       if (conResp?.tone == 'sarcastic') {
         await Future.delayed(const Duration(seconds: 1));
       }
-      _proHp -= conResp?.tone == 'sarcastic' ? 35 : 25;
+      _proHp = (_proHp - (conResp?.tone == 'sarcastic' ? 35 : 25))
+          .clamp(0, 100)
+          .toDouble();
       await Future.delayed(const Duration(seconds: 2));
       _conState = fight.FighterState.idle;
       setState(() {});
@@ -113,25 +137,13 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     // Judge
     await _animateJudge(round.judgeFeedback);
 
-    // Winner
+    if (!mounted) return;
+
     if (state.isComplete) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (!mounted) return;
-      setState(() {
-        _winner = round.responses.isNotEmpty
-            ? round.responses.first.agentId
-            : 'pro';
-        _winnerScore = round.scorePro;
-        _loserScore = round.scoreCon;
-        _showWinner = true;
-        if (_winner == 'pro') {
-          _proState = fight.FighterState.victory;
-          _conState = fight.FighterState.defeated;
-        } else {
-          _conState = fight.FighterState.victory;
-          _proState = fight.FighterState.defeated;
-        }
-      });
+      await _showFinalWinner();
+    } else {
+      await Future.delayed(const Duration(milliseconds: 1200));
+      if (mounted) _triggerNextRound();
     }
   }
 
@@ -147,6 +159,34 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     setState(() {
       _judgeText = feedback.isNotEmpty ? feedback : 'What a clash!';
       _showJudge = true;
+    });
+  }
+
+  Future<void> _showFinalWinner() async {
+    await Future.delayed(const Duration(seconds: 1));
+    if (!mounted) return;
+    final rounds = ref.read(debateProvider).rounds;
+
+    double proTotal = 0;
+    double conTotal = 0;
+    for (final r in rounds) {
+      proTotal += r.scorePro;
+      conTotal += r.scoreCon;
+    }
+    final proWon = proTotal >= conTotal;
+
+    setState(() {
+      _winner = proWon ? 'pro' : 'con';
+      _winnerScore = proWon ? proTotal : conTotal;
+      _loserScore = proWon ? conTotal : proTotal;
+      _showWinner = true;
+      if (proWon) {
+        _proState = fight.FighterState.victory;
+        _conState = fight.FighterState.defeated;
+      } else {
+        _conState = fight.FighterState.victory;
+        _proState = fight.FighterState.defeated;
+      }
     });
   }
 

@@ -42,7 +42,9 @@ def add_round(debate_id: str, round_data: DebateRound) -> DebateSession:
     debate.updated_at = datetime.now(timezone.utc).isoformat()
     if round_data.round_number >= debate.max_rounds:
         debate.status = "completed"
-        debate.winner = "pro" if round_data.score_pro > round_data.score_con else "con"
+        total_pro = sum(r.score_pro for r in debate.rounds)
+        total_con = sum(r.score_con for r in debate.rounds)
+        debate.winner = "pro" if total_pro >= total_con else "con"
     update_document(COLLECTION, debate_id, debate.model_dump())
     return debate
 
