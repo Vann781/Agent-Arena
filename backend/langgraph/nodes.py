@@ -1,37 +1,71 @@
 from backend.langgraph.state import DebateState
 from backend.services.gemini_service import generate_text
 
-PRO_SYSTEM = "You are an expert debater arguing FOR the following topic. Provide a concise, persuasive argument."
-CON_SYSTEM = "You are an expert debater arguing AGAINST the following topic. Provide a concise, persuasive argument."
-JUDGE_SYSTEM = "You are an impartial judge. Evaluate both arguments, provide feedback, and score each out of 10."
+PRO_SYSTEM = (
+    "You are an AGGRESSIVE fighter debating FOR the topic. You talk like a cocky street brawler. "
+    "Keep responses SHORT — 1-2 sentences max. Throw insults, use fighting metaphors, be hyped. "
+    "End your response with a tone tag: [sarcastic], [serious], or [aggressive]."
+)
+
+CON_SYSTEM = (
+    "You are a SNARKY counter-fighter arguing AGAINST the topic. You talk like a slick defensive fighter. "
+    "Keep responses SHORT — 1-2 sentences max. Mock your opponent, use fighting metaphors, be witty. "
+    "End your response with a tone tag: [sarcastic], [serious], or [aggressive]."
+)
+
+JUDGE_SYSTEM = (
+    "You are an EXCITED fight commentator. Give a hype评语 about the round. "
+    "Scores are out of 10. Keep it short. Format:\n"
+    "Commentary: ...\n"
+    "Pro Score: X/10\n"
+    "Con Score: Y/10"
+)
 
 
 def generate_pro_argument(state: DebateState) -> dict:
-    prompt = f"{PRO_SYSTEM}\n\nTopic: {state['topic']}\n{state['description']}\n\nRound {state['current_round'] + 1}:\n"
-    if state.get("con_argument"):
-        prompt += f"Opponent's argument: {state['con_argument']}\n\nRespond to the opponent's argument:"
+    con_prev = state.get("con_argument", "")
+    prompt = (
+        f"{PRO_SYSTEM}\n\nTopic: {state['topic']}\n"
+        f"Round {state['current_round'] + 1} — FIGHT!\n"
+    )
+    if con_prev:
+        prompt += f"Opponent just said: \"{con_prev}\"\n\nSmash that argument!"
+    else:
+        prompt += "Open with a strong attack!\n"
     result = generate_text(prompt)
-    return {"pro_argument": result}
+    tone = "aggressive"
+    for t in ["[sarcastic]", "[serious]", "[aggressive]"]:
+        if t in result:
+            tone = t.strip("[]")
+            result = result.replace(t, "").strip()
+    return {"pro_argument": result, "pro_tone": tone}
 
 
 def generate_con_argument(state: DebateState) -> dict:
-    prompt = f"{CON_SYSTEM}\n\nTopic: {state['topic']}\n{state['description']}\n\nRound {state['current_round'] + 1}:\n"
-    if state.get("pro_argument"):
-        prompt += f"Opponent's argument: {state['pro_argument']}\n\nRespond to the opponent's argument:"
+    prompt = (
+        f"{CON_SYSTEM}\n\nTopic: {state['topic']}\n"
+        f"Round {state['current_round'] + 1} — COUNTER!\n"
+        f"They said: \"{state.get('pro_argument', '')}\"\n\n"
+        "Dodge and counter-attack!\n"
+    )
     result = generate_text(prompt)
-    return {"con_argument": result}
+    tone = "sarcastic"
+    for t in ["[sarcastic]", "[serious]", "[aggressive]"]:
+        if t in result:
+            tone = t.strip("[]")
+            result = result.replace(t, "").strip()
+    return {"con_argument": result, "con_tone": tone}
 
 
 def judge_round(state: DebateState) -> dict:
     prompt = (
         f"{JUDGE_SYSTEM}\n\nTopic: {state['topic']}\n\n"
-        f"Pro Argument (Round {state['current_round'] + 1}):\n{state['pro_argument']}\n\n"
-        f"Con Argument:\n{state['con_argument']}\n\n"
-        "Provide feedback and scores (pro score, con score) in format:\n"
-        "Feedback: ...\nPro Score: X/10\nCon Score: Y/10"
+        f"🔥 PRO (Round {state['current_round'] + 1}):\n{state['pro_argument']}\n\n"
+        f"💧 CON (Round {state['current_round'] + 1}):\n{state['con_argument']}\n\n"
+        "Who won this round?\n"
     )
     result = generate_text(prompt)
-    feedback = result
+    commentary = result
     pro_score = 5.0
     con_score = 5.0
     for line in result.split("\n"):
@@ -49,13 +83,15 @@ def judge_round(state: DebateState) -> dict:
     round_entry = {
         "round_number": state["current_round"] + 1,
         "pro_argument": state["pro_argument"],
+        "pro_tone": state.get("pro_tone", "serious"),
         "con_argument": state["con_argument"],
-        "judge_feedback": feedback,
+        "con_tone": state.get("con_tone", "serious"),
+        "judge_feedback": commentary,
         "score_pro": pro_score,
         "score_con": con_score,
     }
     return {
-        "judge_feedback": feedback,
+        "judge_feedback": commentary,
         "score_pro": pro_score,
         "score_con": con_score,
         "current_round": state["current_round"] + 1,

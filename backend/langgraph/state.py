@@ -7,7 +7,9 @@ class DebateState(TypedDict):
     max_rounds: int
     current_round: int
     pro_argument: str
+    pro_tone: str
     con_argument: str
+    con_tone: str
     judge_feedback: str
     score_pro: float
     score_con: float

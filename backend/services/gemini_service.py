@@ -36,29 +36,21 @@ def generate_text(prompt: str) -> str:
 
 def _mock_response(prompt: str) -> str:
     prompt_lower = prompt.lower()
-    if "arguing for" in prompt_lower or "pro" in prompt_lower:
+    if "counter" in prompt_lower or "con" in prompt_lower:
         return (
-            "Thank you for that opportunity. I firmly believe that this topic has "
-            "significant merit and should be supported. The evidence clearly shows "
-            "positive outcomes when this approach is adopted. We must consider the "
-            "long-term benefits and the progressive impact it will have on society. "
-            "The data overwhelmingly supports this position, and I encourage everyone "
-            "to look at the empirical evidence."
+            "Is that all you got? I've seen better arguments from a fortune cookie! "
+            "You're swinging wild and missing everything. [sarcastic]"
         )
-    elif "arguing against" in prompt_lower or "con" in prompt_lower:
+    elif "attack" in prompt_lower or "pro" in prompt_lower:
         return (
-            "I respectfully disagree with the previous speaker. While the arguments "
-            "presented may sound appealing, they overlook critical flaws. The negative "
-            "consequences far outweigh any potential benefits. We need to consider the "
-            "ethical implications and the practical challenges that make this approach "
-            "problematic. History has shown us that hasty adoption leads to regret."
+            "I'm coming at you like a freight train! This topic is obviously right "
+            "and you know it. Take this L! [aggressive]"
         )
-    elif "judge" in prompt_lower:
+    elif "judge" in prompt_lower or "commentator" in prompt_lower:
         return (
-            "Feedback: Both sides presented compelling arguments. The pro side made "
-            "strong points about potential benefits and cited relevant evidence. The "
-            "con side raised important concerns about implementation challenges.\n"
+            "Commentary: WHAT A ROUND! Both fighters came to throw down! The pro brought "
+            "heat but the con's counter was slick.\n"
             "Pro Score: 7/10\n"
             "Con Score: 6/10"
         )
-    return "This is a well-reasoned argument with supporting evidence."
+    return "You're going down! [aggressive]"

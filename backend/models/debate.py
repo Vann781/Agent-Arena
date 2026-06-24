@@ -11,7 +11,9 @@ class AgentType(StrEnum):
 class DebateRound(BaseModel):
     round_number: int
     pro_argument: str
+    pro_tone: str = "serious"
     con_argument: str
+    con_tone: str = "serious"
     judge_feedback: str
     score_pro: float
     score_con: float
