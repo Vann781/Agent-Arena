@@ -82,6 +82,11 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
 
     await _animateRound();
     _roundInFlight = false;
+
+    if (mounted && !ref.read(debateProvider).isComplete) {
+      await Future.delayed(const Duration(milliseconds: 1200));
+      if (mounted) _triggerNextRound();
+    }
   }
 
   Future<void> _animateRound() async {
@@ -101,11 +106,13 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     // PRO turn
     await _animateAgent(() async {
       if (!mounted) return;
+      _conText = null;
       _proText = proResp?.response ?? '';
       _proState = fight.FighterState.attacking;
       setState(() {});
       await _sound.playSwordSwing();
       if (proResp?.tone == 'sarcastic') {
+        await _sound.playSarcasm();
         await Future.delayed(const Duration(seconds: 1));
       }
       _conHp = (_conHp - (proResp?.tone == 'aggressive' ? 35 : 25))
@@ -119,16 +126,23 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     // CON turn after PRO
     await _animateAgent(() async {
       if (!mounted) return;
+      _proText = null;
       _conText = conResp?.response ?? '';
       _conState = fight.FighterState.attacking;
       setState(() {});
       await _sound.playSwordSwing();
       if (conResp?.tone == 'sarcastic') {
+        await _sound.playSarcasm();
         await Future.delayed(const Duration(seconds: 1));
       }
-      _proHp = (_proHp - (conResp?.tone == 'sarcastic' ? 35 : 25))
-          .clamp(0, 100)
-          .toDouble();
+      _proHp =
+          (_proHp -
+                  ((conResp?.tone == 'aggressive' ||
+                          conResp?.tone == 'sarcastic')
+                      ? 35
+                      : 25))
+              .clamp(0, 100)
+              .toDouble();
       await Future.delayed(const Duration(seconds: 2));
       _conState = fight.FighterState.idle;
       setState(() {});
@@ -141,9 +155,6 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
 
     if (state.isComplete) {
       await _showFinalWinner();
-    } else {
-      await Future.delayed(const Duration(milliseconds: 1200));
-      if (mounted) _triggerNextRound();
     }
   }
 
