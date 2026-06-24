@@ -89,6 +89,8 @@ class DebateNotifier extends StateNotifier<DebateState> {
         chaosMode: response.chaosMode,
         agents: response.agents ?? agents ?? [],
         currentRound: 1,
+        isComplete: false,
+        rounds: [],
       );
     } catch (e) {
       state = state.copyWith(status: DebateStatus.error, error: e.toString());
@@ -141,6 +143,8 @@ class DebateNotifier extends StateNotifier<DebateState> {
         chaosMode: response.chaosMode,
         agents: response.agents ?? request.agents,
         currentRound: 1,
+        isComplete: false,
+        rounds: [],
       );
     } catch (e) {
       state = state.copyWith(status: DebateStatus.error, error: e.toString());
