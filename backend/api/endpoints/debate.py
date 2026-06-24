@@ -71,7 +71,9 @@ def next_round(req: NextRoundRequest):
     round_data = DebateRound(
         round_number=result["current_round"] + 1,
         pro_argument=result["pro_argument"],
+        pro_tone=result.get("pro_tone", "serious"),
         con_argument=result["con_argument"],
+        con_tone=result.get("con_tone", "serious"),
         judge_feedback=result["judge_feedback"],
         score_pro=result["score_pro"],
         score_con=result["score_con"],

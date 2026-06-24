@@ -104,37 +104,33 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
         .where((r) => r.agentId == 'con')
         .firstOrNull;
 
-    // Rambahaur turn
+    // Rambahaur turn — keep both bubbles on screen
     await _animateAgent(() async {
       if (!mounted) return;
-      _conText = null;
       _proText = proResp?.response ?? '';
       _proState = fight.FighterState.attacking;
       setState(() {});
       await _sound.playSwordSwing();
       if (proResp?.tone == 'sarcastic') {
         await _sound.playSarcasm();
-        await Future.delayed(const Duration(seconds: 1));
       }
       _conHp = (_conHp - (proResp?.tone == 'aggressive' ? 35 : 25))
           .clamp(0, 100)
           .toDouble();
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(_displayDuration(_proText ?? ''));
       _proState = fight.FighterState.idle;
       setState(() {});
     });
 
-    // Shaam Bahadur turn
+    // Shaam Bahadur turn — keep pro bubble visible too
     await _animateAgent(() async {
       if (!mounted) return;
-      _proText = null;
       _conText = conResp?.response ?? '';
       _conState = fight.FighterState.attacking;
       setState(() {});
       await _sound.playSwordSwing();
       if (conResp?.tone == 'sarcastic') {
         await _sound.playSarcasm();
-        await Future.delayed(const Duration(seconds: 1));
       }
       _proHp =
           (_proHp -
@@ -144,7 +140,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                       : 25))
               .clamp(0, 100)
               .toDouble();
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(_displayDuration(_conText ?? ''));
       _conState = fight.FighterState.idle;
       setState(() {});
     });
@@ -157,6 +153,11 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
     if (state.isComplete) {
       await _showFinalWinner();
     }
+  }
+
+  Duration _displayDuration(String text) {
+    final ms = text.length * 25 + 1500;
+    return Duration(milliseconds: ms.clamp(3000, 8000));
   }
 
   Future<void> _animateAgent(Future<void> Function() cb) async {
