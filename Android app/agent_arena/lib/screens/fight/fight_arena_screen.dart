@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme/colors.dart';
 import '../../providers/debate_provider.dart';
 import '../../services/sound_manager.dart';
@@ -174,7 +175,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white70),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => context.pop(),
                   ),
                   const Spacer(),
                   Text(
