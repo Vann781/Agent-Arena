@@ -132,10 +132,16 @@ class RespondResponse {
   final int roundNumber;
   final String phase;
   final List<AgentResponse> responses;
+  final String judgeFeedback;
+  final double scorePro;
+  final double scoreCon;
 
   RespondResponse({
     required this.roundNumber,
     required this.phase,
     this.responses = const [],
+    this.judgeFeedback = '',
+    this.scorePro = 0,
+    this.scoreCon = 0,
   });
 }

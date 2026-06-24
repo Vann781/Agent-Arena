@@ -26,7 +26,7 @@ class HealthBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 500),
-            tween: Tween(begin: clamped, end: clamped),
+            tween: Tween(begin: 0, end: clamped),
             builder: (_, value, __) => Container(
               width: 120,
               height: 14,

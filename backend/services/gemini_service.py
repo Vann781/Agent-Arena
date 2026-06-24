@@ -39,18 +39,20 @@ def _mock_response(prompt: str) -> str:
     if "counter" in prompt_lower or "con" in prompt_lower:
         return (
             "Is that all you got? I've seen better arguments from a fortune cookie! "
-            "You're swinging wild and missing everything. [sarcastic]"
+            "You're swinging wild and missing everything. Come on, bring something real. "
+            "This debate is already over. [sarcastic]"
         )
     elif "attack" in prompt_lower or "pro" in prompt_lower:
         return (
             "I'm coming at you like a freight train! This topic is obviously right "
-            "and you know it. Take this L! [aggressive]"
+            "and deep down you know it. There's no defense for your position. "
+            "Take this L and walk away! [aggressive]"
         )
     elif "judge" in prompt_lower or "commentator" in prompt_lower:
         return (
             "Commentary: WHAT A ROUND! Both fighters came to throw down! The pro brought "
-            "heat but the con's counter was slick.\n"
+            "heat but the con's counter was slick and precise.\n"
             "Pro Score: 7/10\n"
             "Con Score: 6/10"
         )
-    return "You're going down! [aggressive]"
+    return "You're going down! I've barely warmed up yet. [aggressive]"

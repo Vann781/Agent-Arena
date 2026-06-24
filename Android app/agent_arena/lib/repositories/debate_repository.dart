@@ -66,6 +66,9 @@ class DebateRepository {
               ),
             ]
           : [],
+      judgeFeedback: lastRound?['judge_feedback'] as String? ?? '',
+      scorePro: ((lastRound?['score_pro'] as num?) ?? 0).toDouble(),
+      scoreCon: ((lastRound?['score_con'] as num?) ?? 0).toDouble(),
     );
   }
 

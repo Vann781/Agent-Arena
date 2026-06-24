@@ -28,6 +28,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   double _conHp = 100;
   String? _proText;
   String? _conText;
+  String? _judgeText;
   bool _showJudge = false;
   bool _showWinner = false;
   String _winner = '';
@@ -55,133 +56,97 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   Future<void> _triggerNextRound() async {
     final notifier = ref.read(debateProvider.notifier);
     setState(() => _processingRound = 1);
+    _showJudge = false;
+    _proText = null;
+    _conText = null;
     await notifier.advanceRound();
-    _animateRound();
+    await _animateRound();
   }
 
-  void _animateRound() {
+  Future<void> _animateRound() async {
     final state = ref.read(debateProvider);
     if (state.rounds.isEmpty) return;
     final round = state.rounds.last;
 
     setState(() => _processingRound = 0);
 
-    _animateAgent(
-      'pro',
-      round.responses.where((r) => r.agentId == 'pro').firstOrNull?.response ??
-          '',
-      () async {
-        if (!mounted) return;
-        _proText =
-            round.responses
-                .where((r) => r.agentId == 'pro')
-                .firstOrNull
-                ?.response ??
-            '';
-        _proState = fight.FighterState.attacking;
-        setState(() {});
-        await _sound.playSwordSwing();
-        final tone =
-            round.responses
-                .where((r) => r.agentId == 'pro')
-                .firstOrNull
-                ?.tone ??
-            '';
-        if (tone == 'sarcastic') {
-          await Future.delayed(const Duration(milliseconds: 200));
-          await _sound.playSarcasm();
-        }
-        _proHp -=
-            (10 -
-                (round.responses
-                            .where((r) => r.agentId == 'pro')
-                            .firstOrNull
-                            ?.tone ==
-                        'aggressive'
-                    ? 7
-                    : 6)) *
-            5;
-        await Future.delayed(const Duration(seconds: 3));
-        _proState = fight.FighterState.idle;
-        setState(() {});
-      },
-    );
+    final proResp = round.responses
+        .where((r) => r.agentId == 'pro')
+        .firstOrNull;
+    final conResp = round.responses
+        .where((r) => r.agentId == 'con')
+        .firstOrNull;
 
-    _animateAgent(
-      'con',
-      round.responses.where((r) => r.agentId == 'con').firstOrNull?.response ??
-          '',
-      () async {
-        if (!mounted) return;
-        _conText =
-            round.responses
-                .where((r) => r.agentId == 'con')
-                .firstOrNull
-                ?.response ??
-            '';
-        _conState = fight.FighterState.attacking;
-        setState(() {});
-        await _sound.playSwordSwing();
-        final tone =
-            round.responses
-                .where((r) => r.agentId == 'con')
-                .firstOrNull
-                ?.tone ??
-            '';
-        if (tone == 'sarcastic') {
-          await Future.delayed(const Duration(milliseconds: 200));
-          await _sound.playSarcasm();
-        }
-        _conHp -=
-            (10 -
-                (round.responses
-                            .where((r) => r.agentId == 'con')
-                            .firstOrNull
-                            ?.tone ==
-                        'sarcastic'
-                    ? 7
-                    : 6)) *
-            5;
-        await Future.delayed(const Duration(seconds: 3));
-        _conState = fight.FighterState.idle;
-        setState(() {});
-      },
-    );
+    // PRO turn
+    await _animateAgent(() async {
+      if (!mounted) return;
+      _proText = proResp?.response ?? '';
+      _proState = fight.FighterState.attacking;
+      setState(() {});
+      await _sound.playSwordSwing();
+      if (proResp?.tone == 'sarcastic') {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+      _conHp -= proResp?.tone == 'aggressive' ? 35 : 25;
+      await Future.delayed(const Duration(seconds: 2));
+      _proState = fight.FighterState.idle;
+      setState(() {});
+    });
 
-    _animateJudge();
+    // CON turn after PRO
+    await _animateAgent(() async {
+      if (!mounted) return;
+      _conText = conResp?.response ?? '';
+      _conState = fight.FighterState.attacking;
+      setState(() {});
+      await _sound.playSwordSwing();
+      if (conResp?.tone == 'sarcastic') {
+        await Future.delayed(const Duration(seconds: 1));
+      }
+      _proHp -= conResp?.tone == 'sarcastic' ? 35 : 25;
+      await Future.delayed(const Duration(seconds: 2));
+      _conState = fight.FighterState.idle;
+      setState(() {});
+    });
 
+    // Judge
+    await _animateJudge(round.judgeFeedback);
+
+    // Winner
     if (state.isComplete) {
-      Future.delayed(const Duration(seconds: 3), () {
-        final winner = round.responses.isNotEmpty
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      setState(() {
+        _winner = round.responses.isNotEmpty
             ? round.responses.first.agentId
             : 'pro';
-        setState(() {
-          _winner = winner;
-          _winnerScore = 70;
-          _loserScore = 50;
-          _showWinner = true;
-          if (winner == 'pro') {
-            _proState = fight.FighterState.victory;
-            _conState = fight.FighterState.defeated;
-          } else {
-            _conState = fight.FighterState.victory;
-            _proState = fight.FighterState.defeated;
-          }
-        });
+        _winnerScore = round.scorePro;
+        _loserScore = round.scoreCon;
+        _showWinner = true;
+        if (_winner == 'pro') {
+          _proState = fight.FighterState.victory;
+          _conState = fight.FighterState.defeated;
+        } else {
+          _conState = fight.FighterState.victory;
+          _proState = fight.FighterState.defeated;
+        }
       });
     }
   }
 
-  void _animateAgent(String id, String text, Future<void> Function() cb) async {
+  Future<void> _animateAgent(Future<void> Function() cb) async {
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     await cb();
   }
 
-  void _animateJudge() async {
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _animateJudge(String feedback) async {
+    await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
-    setState(() => _showJudge = true);
+    setState(() {
+      _judgeText = feedback.isNotEmpty ? feedback : 'What a clash!';
+      _showJudge = true;
+    });
   }
 
   @override
@@ -193,6 +158,9 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(debateProvider);
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final fighterBottom = screenHeight * 0.12;
 
     return Scaffold(
       body: Stack(
@@ -276,10 +244,10 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
           if (_matchStarted) ...[
             Positioned(
               left: 20,
-              bottom: 120,
+              bottom: fighterBottom + bottomInset,
               child: fight.FighterSprite(
                 agentId: 'pro',
-                spritePath: 'characters/agent_pro.png',
+                spritePath: 'assets/characters/agent_pro.png',
                 state: _proState,
                 isLeft: true,
                 healthPercent: _proHp / 100,
@@ -287,21 +255,21 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
             ),
             Positioned(
               right: 20,
-              bottom: 120,
+              bottom: fighterBottom + bottomInset,
               child: fight.FighterSprite(
                 agentId: 'con',
-                spritePath: 'characters/agent_con.png',
+                spritePath: 'assets/characters/agent_con.png',
                 state: _conState,
                 isLeft: false,
                 healthPercent: _conHp / 100,
               ),
             ),
           ],
-          // Speech bubbles
+          // Speech bubbles above fighters
           if (_proText != null && _proText!.isNotEmpty)
             Positioned(
               left: 20,
-              bottom: 280,
+              bottom: fighterBottom + 180 + bottomInset,
               child: SpeechBubble(
                 text: _proText!,
                 color: AppColors.agentA,
@@ -311,7 +279,7 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
           if (_conText != null && _conText!.isNotEmpty)
             Positioned(
               right: 20,
-              bottom: 280,
+              bottom: fighterBottom + 180 + bottomInset,
               child: SpeechBubble(
                 text: _conText!,
                 color: const Color(0xFFFF4081),
@@ -319,26 +287,27 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
               ),
             ),
           // Judge commentary
-          if (_showJudge && state.rounds.isNotEmpty) ...[
+          if (_showJudge && _judgeText != null)
             Positioned(
               left: 0,
               right: 0,
-              bottom: 60,
+              bottom: 16 + bottomInset,
               child: Center(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 40),
-                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.purple.withValues(alpha: 0.2),
+                    color: AppColors.purple.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.purple.withValues(alpha: 0.4),
+                      color: AppColors.purple.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Text(
-                    state.rounds.last.responses.isNotEmpty
-                        ? '⚡ JUDGE: What a clash!'
-                        : '⚡ JUDGE: ...',
+                    '⚡ JUDGE: $_judgeText',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
@@ -348,7 +317,6 @@ class _FightArenaScreenState extends ConsumerState<FightArenaScreen>
                 ),
               ),
             ),
-          ],
           // Start banner before match
           if (!_matchStarted)
             const Center(
